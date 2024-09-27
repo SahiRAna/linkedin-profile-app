@@ -42,8 +42,6 @@ function startAutomation(likeCount, commentCount) {
     let likedPosts = 0;
     let commentedPosts = 0;
 
-    const userComment = prompt("Enter your comment:") || 'CFBR'; // Dynamic comment input
-
     const processPost = (index) => {
         if (index >= posts.length || (likedPosts >= likeCount && commentedPosts >= commentCount)) {
             console.log("Finished liking and commenting.");
@@ -52,55 +50,61 @@ function startAutomation(likeCount, commentCount) {
 
         const post = posts[index];
         const userNameElement = post.querySelector('.feed-shared-actor__name');
-        const userName = userNameElement ? userNameElement.innerText : 'Unknown User';
+        const userName = userNameElement ? userNameElement.innerText : 'Sahil Rana';
 
         // Like posts
         if (likedPosts < likeCount) {
             const likeButton = post.querySelector('button[aria-label="React Like"], button[aria-label="Like"], button[data-control-name="like_button"]');
             if (likeButton) {
-                const delay = (likedPosts === 0 || likedPosts === 1) ? 5000 : 0;
-
                 setTimeout(() => {
                     likeButton.click();
                     likedPosts++;
                     console.log(`Liked post ${index + 1} by ${userName}`);
 
-                    // Automatically comment after liking
+                    // Automatically prompt for a comment after liking
                     const commentButton = post.querySelector('button[aria-label="Comment"], button[aria-label="Add a comment"]');
-                    if (commentButton) {
+                    if (commentButton && commentedPosts < commentCount) {
                         commentButton.click();
                         console.log(`Clicked comment button for post ${index + 1}`);
 
-                        // Attempt to find the comment box immediately after clicking
-                        const tryFindCommentBox = (attempts) => {
-                            if (attempts <= 0) {
-                                console.log(`Comment box not found for post ${index + 1}`);
-                                return;
-                            }
+                        // Prompt user for a unique comment for each post
+                        const userComment = prompt(`Enter your comment for post by ${userName}:`);
 
-                            const commentBox = post.querySelector('textarea[aria-label*="comment"], textarea[aria-label*="Add a comment"]');
-                            if (commentBox) {
-                                commentBox.value = userComment; // Use user input
-                                commentBox.dispatchEvent(new Event('input', { bubbles: true }));
-
-                                const submitButton = post.querySelector('button[aria-label="Post comment"], button[aria-label="Send"]');
-                                if (submitButton) {
-                                    submitButton.click();
-                                    commentedPosts++;
-                                    console.log(`Commented on post ${index + 1} by ${userName}`);
-                                } else {
-                                    console.log(`Submit button not found for post ${index + 1}:`, post.innerHTML);
+                        if (userComment) {
+                            const tryFindCommentBox = (attempts) => {
+                                if (attempts <= 0) {
+                                    console.log(`Comment box not found for post ${index + 1}`);
+                                    return;
                                 }
-                            } else {
-                                setTimeout(() => tryFindCommentBox(attempts - 1), 500);
-                            }
-                        };
 
-                        tryFindCommentBox(5);
+                                const commentBox = post.querySelector('textarea[aria-label*="comment"], textarea[aria-label*="Add a comment"]');
+                                if (commentBox) {
+
+                                    commentBox.value = userComment; // Use user input for comment
+                                    commentBox.dispatchEvent(new Event('input', { bubbles: true })); // Trigger input event
+                                    commentBox.focus(); // Ensure the focus is on the comment box
+
+                                    const submitButton = post.querySelector('button[aria-label="Post comment"], button[aria-label="Send"]');
+                                    if (submitButton) {
+                                        submitButton.click();
+                                        commentedPosts++;
+                                        console.log(`Commented on post ${index + 1} by ${userName}`);
+                                    } else {
+                                        console.log(`Submit button not found for post ${index + 1}:`, post.innerHTML);
+                                    }
+                                } else {
+                                    setTimeout(() => tryFindCommentBox(attempts - 1), 500); // Retry finding the comment box
+                                }
+                            };
+
+                            tryFindCommentBox(3);
+                        } else {
+                            console.log(`No comment provided for post ${index + 1}`);
+                        }
                     } else {
-                        console.log(`Comment button not found for post ${index + 1}:`, post.innerHTML);
+                        console.log(`Comment button not found or comment limit reached for post ${index + 1}:`, post.innerHTML);
                     }
-                }, delay);
+                }, 3000); // Set a delay before liking/commenting
             } else {
                 console.log(`Like button not found for post ${index + 1}:`, post.innerHTML);
             }
@@ -112,7 +116,5 @@ function startAutomation(likeCount, commentCount) {
         setTimeout(() => processPost(index + 1), 3000);
     };
 
-
     processPost(0);
-
 }

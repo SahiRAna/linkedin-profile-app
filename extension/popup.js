@@ -18,12 +18,11 @@ document.addEventListener('DOMContentLoaded', function () {
   likeCountInput.addEventListener('input', checkInput);
   commentCountInput.addEventListener('input', checkInput);
 
-  // sending message to background script
   startButton.addEventListener('click', function () {
     const likeCount = parseInt(likeCountInput.value);
     const commentCount = parseInt(commentCountInput.value);
 
-
+    // -----///----//
     chrome.runtime.sendMessage({
       action: 'startAutomation',
       likeCount,
