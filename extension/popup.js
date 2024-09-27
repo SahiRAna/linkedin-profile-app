@@ -15,23 +15,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Listen for changes in the input fields
   likeCountInput.addEventListener('input', checkInput);
   commentCountInput.addEventListener('input', checkInput);
 
-  // On button click, send message to background script
+  // sending message to background script
   startButton.addEventListener('click', function () {
     const likeCount = parseInt(likeCountInput.value);
     const commentCount = parseInt(commentCountInput.value);
 
-    // Send data to background script
+
     chrome.runtime.sendMessage({
       action: 'startAutomation',
       likeCount,
       commentCount
     });
 
-    // Close the popup
+
     window.close();
   });
 });

@@ -1,7 +1,7 @@
-// Listen for messages from the popup or other parts of the extension
+// Listen for messages from the popup or other parts of the extension ----1st Part
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'startAutomation') {
-        // Query the active tab
+
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (!tabs || tabs.length === 0) {
                 console.error("No active tab found.");
@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             }
 
             const activeTab = tabs[0];
-            console.log("Active Tab URL: ", activeTab.url); // Log the URL for debugging
+            console.log("Active Tab URL: ", activeTab.url);
 
             // Ensure the tab URL includes LinkedIn's feed
             if (activeTab.url && activeTab.url.includes('linkedin.com/feed')) {
@@ -27,6 +27,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
     }
 });
+//----2nd Part----
 function startAutomation(likeCount, commentCount) {
     console.log(`Starting automation with likeCount: ${likeCount}, commentCount: ${commentCount}`);
 
@@ -57,7 +58,7 @@ function startAutomation(likeCount, commentCount) {
         if (likedPosts < likeCount) {
             const likeButton = post.querySelector('button[aria-label="React Like"], button[aria-label="Like"], button[data-control-name="like_button"]');
             if (likeButton) {
-                const delay = (likedPosts === 0 || likedPosts === 1) ? 5000 : 0; // Reduce to 5 seconds for the first two posts
+                const delay = (likedPosts === 0 || likedPosts === 1) ? 5000 : 0;
 
                 setTimeout(() => {
                     likeButton.click();
@@ -91,11 +92,11 @@ function startAutomation(likeCount, commentCount) {
                                     console.log(`Submit button not found for post ${index + 1}:`, post.innerHTML);
                                 }
                             } else {
-                                setTimeout(() => tryFindCommentBox(attempts - 1), 500); // Check every 500ms instead of 1s
+                                setTimeout(() => tryFindCommentBox(attempts - 1), 500);
                             }
                         };
 
-                        tryFindCommentBox(5); // Try 5 times to find the comment box
+                        tryFindCommentBox(5);
                     } else {
                         console.log(`Comment button not found for post ${index + 1}:`, post.innerHTML);
                     }
@@ -107,11 +108,11 @@ function startAutomation(likeCount, commentCount) {
             console.log(`Like limit reached for post ${index + 1}`);
         }
 
-        // Proceed to the next post without delay for now
-        setTimeout(() => processPost(index + 1), 3000); // 3 seconds delay between posts
+
+        setTimeout(() => processPost(index + 1), 3000);
     };
 
-    // Start processing from the first post
+
     processPost(0);
 
 }
