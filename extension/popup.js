@@ -1,18 +1,37 @@
 document.addEventListener('DOMContentLoaded', function () {
-  document.getElementById('openProfiles').addEventListener('click', function () {
-    const profileLinks = [
-      'https://www.linkedin.com/in/arushi-sambyal-4b3904259/',
-      'https://www.linkedin.com/in/shilpa-sharma-49362822a/',
-      'https://www.linkedin.com/in/divya-rana-72778621b/'
-    ];
-    profiles.forEach((profile, index) => {
-      setTimeout(() => {
-        chrome.tabs.create({ url: profile });
-      }, index * 5000);
+  const likeCountInput = document.getElementById('likeCount');
+  const commentCountInput = document.getElementById('commentCount');
+  const startButton = document.getElementById('startButton');
+
+  // Enable the button only if both fields have values
+  function checkInput() {
+    const likeCount = likeCountInput.value;
+    const commentCount = commentCountInput.value;
+
+    if (likeCount && commentCount) {
+      startButton.disabled = false;
+    } else {
+      startButton.disabled = true;
+    }
+  }
+
+  // Listen for changes in the input fields
+  likeCountInput.addEventListener('input', checkInput);
+  commentCountInput.addEventListener('input', checkInput);
+
+  // On button click, send message to background script
+  startButton.addEventListener('click', function () {
+    const likeCount = parseInt(likeCountInput.value);
+    const commentCount = parseInt(commentCountInput.value);
+
+    // Send data to background script
+    chrome.runtime.sendMessage({
+      action: 'startAutomation',
+      likeCount,
+      commentCount
     });
 
-    chrome.runtime.sendMessage({ action: "openProfiles", links: profileLinks }, (response) => {
-      console.log(response.status); // Log response status
-    });
+    // Close the popup
+    window.close();
   });
 });
